@@ -12,5 +12,8 @@ router.post("/register", (req, res) => {
     res.send("Register");
 });
 router.post("/login", (req, res) => {});
+router.post("/logout", (req, res) => {
+    console.log("Logout successfully");
+});
 export default router;
 

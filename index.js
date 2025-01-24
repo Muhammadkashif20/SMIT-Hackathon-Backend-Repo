@@ -14,11 +14,15 @@ mongoose
 app.use(cors());
 app.use("/users",userRouter)
 app.use("/auth",userRouter)
+
 app.get("/login", (req, res) => {
   res.send("Login");
 });
 app.get("/signup", (req, res) => {
   res.send("signup");
 });
+app.get("/logout", (req, res) => {
+    res.send("logout");
+  });
 
 app.listen(PORT, () => console.log("Port is Running ON =>", PORT));
