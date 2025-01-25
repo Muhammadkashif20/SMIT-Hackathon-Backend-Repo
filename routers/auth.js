@@ -6,18 +6,15 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 import sendResponse from "../Helpers/sendResponse.js";
 import Users from "../models/Users.js";
-
 const registerSchema = Joi.object({
   cnic: Joi.string().length(13).pattern(/^[0-9]+$/).required(),
   password: Joi.string().min(6).required(),
   fullname: Joi.string().alphanum().min(3).max(30).required(),
 });
-
 const loginSchema = Joi.object({
   cnic: Joi.string().length(13).pattern(/^[0-9]+$/).required(),  
   password: Joi.string().min(6).required(),
 });
-
 router.post("/register", async (req, res) => {
   const { error, value } = registerSchema.validate(req.body);
   console.log("error=> ", error);
