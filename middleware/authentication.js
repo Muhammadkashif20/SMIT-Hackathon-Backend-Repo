@@ -25,6 +25,7 @@ export async function authicateUser(req, res, next) {
       req.user = decoded;
       return next();
     }
+    
     else{
         return sendResponse(res, 401, true, null, "Invalid Token");
     }
