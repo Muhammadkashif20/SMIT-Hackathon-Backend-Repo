@@ -1,6 +1,6 @@
 import express from "express";
 import sendResponse from "../Helpers/sendResponse.js";
-import LoanRequest from "../models/loanRequest.js";
+import LoanRequest from "../models/LoanRequest.js";
 const router=express.Router();
 router.get("/getLoanRequest",async(req,res)=>{
   const loanRequest=await LoanRequest.find();
