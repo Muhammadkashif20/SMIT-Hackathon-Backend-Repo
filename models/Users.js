@@ -7,6 +7,7 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     gender: { type: String, required: true },
     city: { type: String },
+    country: { type: String },
     gender: { type: String, enum: ["male", "female"] },
     dob: { type: String },
     isProfileComplete: { type: Boolean },

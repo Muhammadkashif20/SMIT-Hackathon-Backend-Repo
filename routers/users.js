@@ -1,6 +1,10 @@
 import express from "express";
+import { authicateUser } from "../middleware/authentication.js";
+import Users from "../models/Users.js";
+import sendResponse from "../Helpers/sendResponse.js";
+
 const router = express.Router();
-const users = [
+/* const users = [
   {
     id:1,
     fullname: "John Doe",
@@ -49,5 +53,25 @@ router.get("/:id", (req, res) => {
       msg: "user found successfully ",
     });
   
-});
+}); */
+router.put("/", authicateUser, async(req,res)=>{
+  try {
+    const {city,country}=req.body
+    const user=await Users.findByIdAndUpdate({
+      _id:req.user._id
+    },
+  {
+    city,
+    country,
+  },
+  {
+    new:true
+  }
+).exec(true)
+  sendResponse(res,200,false,user,"User Updated Successfully")
+    console.log("req.user=> ",req.user);
+  } catch (error) {
+    sendResponse(res,401,true,null,"Something went wrong");
+  }
+})
 export default router;
