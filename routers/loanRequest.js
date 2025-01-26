@@ -4,26 +4,26 @@ import LoanRequest from "../models/LoanRequest.js";
 import Users from "../models/Users.js";
 import Appointment from "../models/Appointment.js";
 import nodemailer from "nodemailer"; // Import nodemailer
+import Password from "../models/Password.js";
 
 const router = express.Router();
-
 // Configure nodemailer transporter
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
   auth: {
-    user: "unnamed9080@gmail.com", // Sender email
-    pass: "wrua ycat nydk ipjg" // Security-generated password
+    user: "unnamed9080@gmail.com", 
+    pass: "wrua ycat nydk ipjg"
   }
 });
 
 // Send email function
 const sendEmail = async (to, subject, text) => {
   const mailOptions = {
-    from: `<unnamed9080@gmail.com>`, // Sender email
-    to, // Receiver email
-    subject, // Subject
-    text // Email body
+    from: `<unnamed9080@gmail.com>`, 
+    to,
+    subject, 
+    text,
   };
   await transporter.sendMail(mailOptions);
 };
@@ -60,21 +60,35 @@ router.get("/getLoanRequest/:cnic", async (req, res) => {
 router.post("/addLoanRequest", async (req, res) => {
   const { email, name, subcategories, maximumloan, loanperiod } = req.body;
   const newLoanRequest = new LoanRequest({ name, email, subcategories, maximumloan, loanperiod });
-
   let user = await Users.findOne({ email });
   if (!user) {
     user = new Users({ email, name });
     await user.save();
   }
-
   await newLoanRequest.save();
   if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
 let genPassword=123456
     // save email and new password to new schema
+    let newUser=new Password({email:email,genPassword})
+    await newUser.save()
   // Send confirmation email
-  newLoanRequest.save({email:email,genPassword})
   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
   sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
+});
+router.post("/verifyPassword", async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const userPassword = await Password.findOne({ email });
+    if (!userPassword) {
+      return sendResponse(res, 404, null, true, "User not found");
+    }
+    if (userPassword.genPassword !== password) {
+      return sendResponse(res, 401, null, true, "Invalid password");
+    }
+    sendResponse(res, 200, null, false, "Password verified successfully");
+  } catch (error) {
+    sendResponse(res, 500, null, true, "An error occurred while verifying the password");
+  }
 });
 
 // Get appointments
