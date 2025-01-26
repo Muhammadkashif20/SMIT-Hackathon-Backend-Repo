@@ -48,6 +48,7 @@ router.post("/login", async (req, res) => {
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   console.log("token=> ", token);
   sendResponse(res, 201, { user, token }, false, "User Logged In Successfully");
+
 });
 
 export default router;
