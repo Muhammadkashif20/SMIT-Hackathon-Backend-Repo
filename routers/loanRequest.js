@@ -3,11 +3,11 @@ import sendResponse from "../Helpers/sendResponse.js";
 import LoanRequest from "../models/LoanRequest.js";
 import Users from "../models/Users.js";
 import Appointment from "../models/Appointment.js";
-import nodemailer from "nodemailer"; // Import nodemailer
+import nodemailer from "nodemailer"; 
 import Password from "../models/Password.js";
 
 const router = express.Router();
-// Configure nodemailer transporter
+
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
@@ -27,7 +27,6 @@ const sendEmail = async (to, subject, text) => {
   };
   await transporter.sendMail(mailOptions);
 };
-
 // Get loan requests
 router.get("/getLoanRequest", async (req, res) => {
   const { city, country } = req.query;
