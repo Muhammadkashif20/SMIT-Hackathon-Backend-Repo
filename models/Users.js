@@ -2,9 +2,9 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 const userSchema = new Schema(
   {
-    fullname: { type: String, required: true },
-    cnic: { type: String, unique: true, required: true },
-    password: { type: String, required: true },
+    fullname: { type: String,  },
+    cnic: { type: String, unique: true,  },
+    password: { type: String,  },
     city: { type: String },
     country: { type: String },
     gender: { type: String, enum: ["male", "female"] },

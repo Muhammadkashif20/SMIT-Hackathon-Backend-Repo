@@ -57,7 +57,6 @@ router.get("/getLoanRequest/:cnic", async (req, res) => {
 
 // Add a new loan request
 router.post("/addLoanRequest", async (req, res) => {
-  
   const { email, name,categories, maximumloan, loanperiod } = req.body;
   // console.log("req.body=> ", req.body);
   try {
@@ -72,7 +71,6 @@ router.post("/addLoanRequest", async (req, res) => {
      sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
   } catch (error) {
   }
-
   // console.log("newLoanRequest=> ", newLoanRequest);
   
 //   let user = await Users.findOne({ email });
