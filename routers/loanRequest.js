@@ -36,57 +36,71 @@ router.get("/getLoanRequest", async (req, res) => {
   } else {
     loanRequest = await LoanRequest.find();
   }
-  if (!loanRequest) return sendResponse(res, 400, null, true, "Loan Request Failed");
-  sendResponse(res, 200, loanRequest, false, "Loan Request Successfully");
+  if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
+  sendResponse(res, 200, false, loanRequest, "Loan Request Successfully");
 });
 
 // Get loan request by ID
 router.get("/getLoanRequestById/:id", async (req, res) => {
   const { id } = req.params;
   const loan = await LoanRequest.findById(id);
-  if (!loan) return sendResponse(res, 400, null, true, "Loan Request Not Found");
-  sendResponse(res, 200, loan, false, "Loan Request Successfully");
+  if (!loan) return sendResponse(res, 400, true, null, "Loan Request Not Found");
+  sendResponse(res, 200, false, loan, "Loan Request Successfully");
 });
 
 // Get loan request by CNIC
 router.get("/getLoanRequest/:cnic", async (req, res) => {
   const loanRequest = await LoanRequest.find({ cnic: req.params.cnic });
-  if (!loanRequest) return sendResponse(res, 400, null, true, "Loan Request Failed");
-  sendResponse(res, 200, loanRequest, false, "Loan Request Successfully");
+  if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
+  sendResponse(res, 200, false, loanRequest, "Loan Request Successfully");
 });
 
 // Add a new loan request
 router.post("/addLoanRequest", async (req, res) => {
-  const { email, name, subcategories, maximumloan, loanperiod } = req.body;
-  const newLoanRequest = new LoanRequest({ name, email, subcategories, maximumloan, loanperiod });
-  let user = await Users.findOne({ email });
-  if (!user) {
-    user = new Users({ email, name });
-    await user.save();
+  
+  const { email, name,categories, maximumloan, loanperiod } = req.body;
+  // console.log("req.body=> ", req.body);
+  try {
+    if (!email || !name || !categories || !maximumloan || !loanperiod) {
+      return sendResponse(res, 400, true, null, "Please provide all required fields"); 
+    }
+    const newLoanRequest = new LoanRequest({ name, email,categories, maximumloan, loanperiod });
+    if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
+    const newLoan=await newLoanRequest.save();
+    if (!newLoan) return sendResponse(res, 400, true, null, "Loan Request Failed");
+    console.log("newLoan=>",newLoan);
+     sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
+  } catch (error) {
   }
-  await newLoanRequest.save();
-  if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
-let genPassword=123456
-    // save email and new password to new schema
-    let newUser=new Password({email:email,genPassword})
-    await newUser.save()
-  // Send confirmation email
-  await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
-  sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
+
+  // console.log("newLoanRequest=> ", newLoanRequest);
+  
+//   let user = await Users.findOne({ email });
+//   if (!user) {
+//     user = new Users({ email, name });
+//     await user.save();
+//   }
+
+// let genPassword=123456
+//     // save email and new password to new schema
+//     let newUser=new Password({email:email,genPassword})
+//     await newUser.save()
+//   // Send confirmation email
+//   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
 });
 router.post("/verifyPassword", async (req, res) => {
   const { email, password } = req.body;
   try {
     const userPassword = await Password.findOne({ email });
     if (!userPassword) {
-      return sendResponse(res, 404, null, true, "User not found");
+      return sendResponse(res, 404, true, null, "User not found");
     }
     if (userPassword.genPassword !== password) {
-      return sendResponse(res, 401, null, true, "Invalid password");
+      return sendResponse(res, 401, true, null, "Invalid password");
     }
-    sendResponse(res, 200, null, false, "Password verified successfully");
+    sendResponse(res, 200, false, null, "Password verified successfully");
   } catch (error) {
-    sendResponse(res, 500, null, true, "An error occurred while verifying the password");
+    sendResponse(res, 500, true, null, "An error occurred while verifying the password");
   }
 });
 
@@ -99,8 +113,8 @@ router.get("/getAppointment", async (req, res) => {
   } else {
     appointmentRequest = await Appointment.find();
   }
-  if (!appointmentRequest) return sendResponse(res, 400, null, true, "Appointment Request Failed");
-  sendResponse(res, 200, appointmentRequest, false, "Appointment Request Successfully");
+  if (!appointmentRequest) return sendResponse(res, 400, true, null, "Appointment Request Failed");
+  sendResponse(res, 200, false, appointmentRequest, "Appointment Request Successfully");
 });
 
 // Add an appointment (example)

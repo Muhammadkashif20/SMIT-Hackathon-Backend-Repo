@@ -4,7 +4,7 @@ const loanRequestSchema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
-    subcategories:{type: String, required: true},
+    categories:{type: String, required: true},
     maximumloan:{type: Number, required: true},
     loanperiod:{type: Number, required: true},
   },
