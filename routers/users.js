@@ -54,24 +54,24 @@ router.get("/:id", (req, res) => {
     });
   
 }); */
-router.put("/", authicateUser, async(req,res)=>{
-  try {
-    const {city,country}=req.body
-    const user=await Users.findByIdAndUpdate({
-      _id:req.user._id
-    },
-  {
-    city,
-    country,
-  },
-  {
-    new:true
-  }
-).exec(true)
-  sendResponse(res,200,false,user,"User Updated Successfully")
-    console.log("req.user=> ",req.user);
-  } catch (error) {
-    sendResponse(res,401,true,null,"Something went wrong");
-  }
-})
+// router.put("/", authicateUser, async(req,res)=>{
+//   try {
+//     const {city,country}=req.body
+//     const user=await Users.findByIdAndUpdate({
+//       _id:req.user._id
+//     },
+//   {
+//     city,
+//     country,
+//   },
+//   {
+//     new:true
+//   }
+// ).exec(true)
+//   sendResponse(res,200,false,user,"User Updated Successfully")
+//     console.log("req.user=> ",req.user);
+//   } catch (error) {
+//     sendResponse(res,401,true,null,"Something went wrong");
+//   }
+// })
 export default router;
