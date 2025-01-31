@@ -1,4 +1,4 @@
-/* import mongoose from "mongoose";
+import mongoose from "mongoose";
 const { Schema } = mongoose;
 const userSchema = new Schema(
   {
@@ -13,4 +13,3 @@ const userSchema = new Schema(
 );
 const Users = mongoose.model("Users", userSchema);
 export default Users;
- */

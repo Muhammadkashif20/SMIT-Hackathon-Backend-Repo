@@ -1,6 +1,6 @@
 import express from "express";
 import { authicateUser } from "../middleware/authentication.js";
-import Users from "../models/Users.js";
+// import Users from "../models/Users.js";
 import sendResponse from "../Helpers/sendResponse.js";
 
 const router = express.Router();

@@ -9,6 +9,6 @@ const appointmentSchema = new mongoose.Schema({
     slotStatus: { type: String, enum: ['Scheduled', 'Completed', 'Cancelled'], default: 'Scheduled' },
     createdAt: { type: Date, default: Date.now }, // Appointment creation timestamp
   });
-  
+
   const Appointment = mongoose.model('Appointment', appointmentSchema);
   export default Appointment
