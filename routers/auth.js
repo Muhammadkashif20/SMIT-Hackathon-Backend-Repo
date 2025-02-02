@@ -7,12 +7,18 @@ import jwt from "jsonwebtoken";
 import sendResponse from "../Helpers/sendResponse.js";
 import Users from "../models/Users.js";
 const registerSchema = Joi.object({
-  cnic: Joi.string().length(13).pattern(/^[0-9]+$/).required(),
+  cnic: Joi.string()
+    .length(13)
+    .pattern(/^[0-9]+$/)
+    .required(),
   email: Joi.string().email().required(),
-  password: Joi.string().min(6).required(),
+  fullname: Joi.string().min(3).required(),
 });
 const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
+  cnic: Joi.string()
+    .length(13)
+    .pattern(/^[0-9]+$/)
+    .required(),
   password: Joi.string().min(6).required(),
 });
 router.post("/proceed", async (req, res) => {
@@ -20,14 +26,21 @@ router.post("/proceed", async (req, res) => {
   console.log("error=> ", error);
   if (error) return sendResponse(res, 400, true, null, error.message);
   console.log("value=> ", value);
-  const user = await Users.findOne({ email: value.email });
+  const user = await Users.findOne({ cnic: value.cnic });
   if (user) return sendResponse(res, 400, true, null, "User Already Exists");
-  const hashPassword = await bcrypt.hash(value.password, 12);
-  value.password = hashPassword;
-  let newUser = new Users({ ...value });
-  console.log("newUser=> ", newUser);
+  // after add new user generate a random password with converted into hashed:-
+  let genRandomPass = Math.random().toString(36).slice(-8);
+  console.log("genRandomPass=>", genRandomPass);
+  let hashPass = await bcrypt.hash(genRandomPass, 10);
+  console.log("hashPass=>", hashPass);
+  let newUser = new Users({
+    ...value,
+    plainPassword: genRandomPass,
+    password: hashPass,
+  });
   newUser = await newUser.save();
-  sendResponse(res, 201, false, newUser, "User Registered Successfully");
+  console.log("newUser=> ", newUser);
+  sendResponse(res, 201, false, {newUser , plainPassword:genRandomPass}, "User Registered Successfully");
 });
 
 router.post("/login", async (req, res) => {
@@ -35,15 +48,14 @@ router.post("/login", async (req, res) => {
   console.log("error=> ", error);
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
   console.log("value=> ", value);
-  const user = await Users.findOne({ email: value.email }).lean();
+  const user = await Users.findOne({ cnic: value.cnic })
+    .select("+plainPassword")
+    .lean();
   if (!user)
     return sendResponse(res, 400, null, true, "User is Not Registered");
-  const isPasswordValid = await bcrypt.compare(value.password, user.password);
-  if (!isPasswordValid)
-    return sendResponse(res, 400, null, true, "Invalid Credentials");
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   console.log("token=> ", token);
-  sendResponse(res, 201, { user, token }, false, "User Logged In Successfully");
+  sendResponse(res, 201, { user, token,plainPassword:user.plainPassword }, false, "User Logged In Successfully");
 });
 
 export default router;
