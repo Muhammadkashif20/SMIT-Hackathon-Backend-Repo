@@ -71,6 +71,7 @@ router.post("/addLoanRequest", async (req, res) => {
      sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
   } catch (error) {
   }
+});
   // console.log("newLoanRequest=> ", newLoanRequest);
   
 //   let user = await Users.findOne({ email });
@@ -83,9 +84,17 @@ router.post("/addLoanRequest", async (req, res) => {
 //     // save email and new password to new schema
 //     let newUser=new Password({email:email,genPassword})
 //     await newUser.save()
-//   // Send confirmation email
+//    // Send confirmation email
 //   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
-});
+// });
+// router.post("/password", async (req, res) => {
+//   let genPassword=123456
+//     // save email and new password to new schema
+//     let newUser=new Password({email:email,genPassword})
+//     await newUser.save()
+//    // Send confirmation email
+//   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
+// });
 router.post("/verifyPassword", async (req, res) => {
   const { email, password } = req.body;
   try {
