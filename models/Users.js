@@ -9,7 +9,6 @@ const userSchema = new Schema(
     password: { type: String, required: true },
     country: { type: String },
     gender: { type: String, enum: ["male", "female"] },
-    plainPassword:{type:String}
     },
   { timestamps: true }
 );

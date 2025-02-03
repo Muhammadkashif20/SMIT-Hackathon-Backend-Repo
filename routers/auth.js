@@ -35,12 +35,14 @@ router.post("/proceed", async (req, res) => {
   console.log("hashPass=>", hashPass);
   let newUser = new Users({
     ...value,
-    plainPassword: genRandomPass,
     password: hashPass,
   });
   newUser = await newUser.save();
   console.log("newUser=> ", newUser);
-  sendResponse(res, 201, false, {newUser , plainPassword:genRandomPass}, "User Registered Successfully");
+  const responseData = { newUser, plainPassword: genRandomPass };
+  console.log("Response Data=>", responseData); 
+  sendResponse(res, 201, false, responseData, "User Registered Successfully");
+
 });
 
 router.post("/login", async (req, res) => {
@@ -55,7 +57,7 @@ router.post("/login", async (req, res) => {
     return sendResponse(res, 400, null, true, "User is Not Registered");
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   console.log("token=> ", token);
-  sendResponse(res, 201, { user, token,plainPassword:user.plainPassword }, false, "User Logged In Successfully");
+  sendResponse(res, 201,false, { user,token}, "User Logged In Successfully");
 });
 
 export default router;
