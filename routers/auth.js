@@ -30,9 +30,9 @@ router.post("/proceed", async (req, res) => {
   if (user) return sendResponse(res, 400, true, null, "User Already Exists");
   // after add new user generate a random password with converted into hashed:-
   let genRandomPass = Math.random().toString(36).slice(-8);
-  console.log("genRandomPass=>", genRandomPass);
   let hashPass = await bcrypt.hash(genRandomPass, 10);
   console.log("hashPass=>", hashPass);
+  console.log("genRandomPass=>", genRandomPass);
   let newUser = new Users({
     ...value,
     password: hashPass,
@@ -47,17 +47,40 @@ router.post("/proceed", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
-  console.log("error=> ", error);
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
-  console.log("value=> ", value);
+
   const user = await Users.findOne({ cnic: value.cnic })
-    .select("+plainPassword")
+    .select("+password") // Make sure password is hashed in DB
     .lean();
-  if (!user)
-    return sendResponse(res, 400, null, true, "User is Not Registered");
+
+  if (!user) return sendResponse(res, 400, true, null, "User is Not Registered");
+
+  const isMatch = await bcrypt.compare(value.password, user.password);
+  if (!isMatch) return sendResponse(res, 400, true, null, "Incorrect password");
+
   var token = jwt.sign(user, process.env.AUTH_SECRET);
-  console.log("token=> ", token);
-  sendResponse(res, 201,false, { user,token}, "User Logged In Successfully");
+  sendResponse(res, 201, false, { user, token }, "User Logged In Successfully");
+});
+router.post("/updatePassword", async (req, res) => {
+  try {
+    const { cnic, oldPassword, password } = req.body;
+    console.log("Received Old Password:", oldPassword);
+
+    const user = await Users.findOne({ cnic }).select("+password");
+    if (!user) return sendResponse(res, 400, true, null, "User not found");
+    console.log("Stored Hashed Password:", user.password);
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    console.log("Password Match Result:", isMatch);
+    if (!isMatch) return sendResponse(res, 400, true, null, "Old password is incorrect");
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log("New Hashed Password:", hashedPassword);
+    user.password = hashedPassword;
+    await user.save();
+    sendResponse(res, 200, false, null, "Password updated successfully");
+  } catch (error) {
+    console.error("Error updating password:", error);
+    sendResponse(res, 500, true, null, "Internal server error");
+  }
 });
 
 export default router;
