@@ -44,14 +44,13 @@ router.post("/proceed", async (req, res) => {
   sendResponse(res, 201, false, responseData, "User Registered Successfully");
 
 });
-
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
 
   const user = await Users.findOne({ cnic: value.cnic })
-    .select("+password") // Make sure password is hashed in DB
-    .lean();
+    .select("+password") 
+    .lean()
 
   if (!user) return sendResponse(res, 400, true, null, "User is Not Registered");
 
@@ -63,15 +62,23 @@ router.post("/login", async (req, res) => {
 });
 router.post("/updatePassword", async (req, res) => {
   try {
-    const { cnic, oldPassword, password } = req.body;
+    const token = req.headers.authorization?.split(" ")[1];
+    console.log("token=>",token);
+    if (!token) {
+      return sendResponse(res, 401, true, null, "Unauthorized: No token provided");
+    }
+    const decoded = jwt.verify(token, process.env.AUTH_SECRET);
+    const cnic = decoded.cnic; 
+    const { oldPassword, password } = req.body;
     console.log("Received Old Password:", oldPassword);
-
     const user = await Users.findOne({ cnic }).select("+password");
     if (!user) return sendResponse(res, 400, true, null, "User not found");
     console.log("Stored Hashed Password:", user.password);
+
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     console.log("Password Match Result:", isMatch);
     if (!isMatch) return sendResponse(res, 400, true, null, "Old password is incorrect");
+
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("New Hashed Password:", hashedPassword);
     user.password = hashedPassword;
@@ -82,5 +89,6 @@ router.post("/updatePassword", async (req, res) => {
     sendResponse(res, 500, true, null, "Internal server error");
   }
 });
+
 
 export default router;

@@ -27,7 +27,7 @@ const sendEmail = async (to, subject, text) => {
   };
   await transporter.sendMail(mailOptions);
 };
-// Get loan requests
+// Get loan requests 
 router.get("/getLoanRequest", async (req, res) => {
   const { city, country } = req.query;
   let loanRequest = null;
@@ -37,7 +37,7 @@ router.get("/getLoanRequest", async (req, res) => {
     loanRequest = await LoanRequest.find();
   }
   if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
-  sendResponse(res, 200, false, loanRequest, "Loan Request Successfully");
+  sendResponse(res, 200, false, loanRequest, "Get Loan Request Successfully");
 });
 
 // Get loan request by ID
