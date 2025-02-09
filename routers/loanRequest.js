@@ -5,9 +5,7 @@ import Users from "../models/Users.js";
 import Appointment from "../models/Appointment.js";
 import nodemailer from "nodemailer"; 
 import Password from "../models/Password.js";
-
 const router = express.Router();
-
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   host: 'smtp.gmail.com',
@@ -27,7 +25,7 @@ const sendEmail = async (to, subject, text) => {
   };
   await transporter.sendMail(mailOptions);
 };
-// Get loan requests 
+// user Endpoints:- 
 router.get("/getLoanRequest", async (req, res) => {
   const { city, country } = req.query;
   let loanRequest = null;
@@ -39,8 +37,20 @@ router.get("/getLoanRequest", async (req, res) => {
   if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
   sendResponse(res, 200, false, loanRequest, "Get Loan Request Successfully");
 });
+// admin Endpoints:-
+router.get("/getAllApplication", async (req, res) => {
+  const { city, country } = req.query;
+  let allApplication = null;
+  if (city && country) {
+    allApplication = await LoanRequest.find({ city, country });
+  } else {
+    allApplication = await LoanRequest.find();
+  }
+  if (!allApplication) return sendResponse(res, 400, true, null, "Application Request Failed");
+  sendResponse(res, 200, false, allApplication, "Get All Application Successfully");
+});
 
-// Get loan request by ID
+// user Endpoints:-
 router.get("/getLoanRequestById/:id", async (req, res) => {
   const { id } = req.params;
   const loan = await LoanRequest.findById(id);
@@ -48,22 +58,22 @@ router.get("/getLoanRequestById/:id", async (req, res) => {
   sendResponse(res, 200, false, loan, "Loan Request Successfully");
 });
 
-// Get loan request by CNIC
+// user Endpoints:-
 router.get("/getLoanRequest/:cnic", async (req, res) => {
   const loanRequest = await LoanRequest.find({ cnic: req.params.cnic });
   if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
   sendResponse(res, 200, false, loanRequest, "Loan Request Successfully");
 });
 
-// Add a new loan request
+// user Endpoints:-
 router.post("/addLoanRequest", async (req, res) => {
-  const { email, name,categories, maximumloan, loanperiod } = req.body;
-  // console.log("req.body=> ", req.body);
+  const { cnic,email, name,loanType,categories,subCategories, maximumloan, loanperiod,city,country } = req.body;
+  console.log("req.body=> ", req.body);
   try {
-    if (!email || !name || !categories || !maximumloan || !loanperiod) {
+    if (!cnic || !email || !loanType ||  !name || !categories || !subCategories || !maximumloan || !loanperiod || !city || !country) {
       return sendResponse(res, 400, true, null, "Please provide all required fields"); 
     }
-    const newLoanRequest = new LoanRequest({ name, email,categories, maximumloan, loanperiod });
+    const newLoanRequest = new LoanRequest({ email,name, cnic,loanType,categories,subCategories, maximumloan, loanperiod,city,country });
     if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
     const newLoan=await newLoanRequest.save();
     if (!newLoan) return sendResponse(res, 400, true, null, "Loan Request Failed");
@@ -73,7 +83,6 @@ router.post("/addLoanRequest", async (req, res) => {
   }
 });
   // console.log("newLoanRequest=> ", newLoanRequest);
-  
 //   let user = await Users.findOne({ email });
 //   if (!user) {
 //     user = new Users({ email, name });
@@ -110,33 +119,34 @@ router.post("/verifyPassword", async (req, res) => {
     sendResponse(res, 500, true, null, "An error occurred while verifying the password");
   }
 });
+router.get("/getAppointment", async (req, res) => {
+  const { city, country } = req.query;
+  console.log("req.query=>",req.query);
+  let appointmentRequest = null;
+  if (city && country) {
+    appointmentRequest = await Appointment.find({ city, country });
+  } else {
+    appointmentRequest = await Appointment.find();
+  }
+  if (!appointmentRequest) return sendResponse(res, 400, true, null, "Appointment Request Failed");
+  sendResponse(res, 200, false, appointmentRequest, "Appointment Request Successfully");
+});
 
-// Get appointments
-// router.get("/getAppointment", async (req, res) => {
-//   const { city, country } = req.query;
-//   let appointmentRequest = null;
-//   if (city && country) {
-//     appointmentRequest = await Appointment.find({ city, country });
-//   } else {
-//     appointmentRequest = await Appointment.find();
-//   }
-//   if (!appointmentRequest) return sendResponse(res, 400, true, null, "Appointment Request Failed");
-//   sendResponse(res, 200, false, appointmentRequest, "Appointment Request Successfully");
-// });
+// Add an appointment
+router.post("/addAppointment", async (req, res) => {
+  const { userId, applicationId, appointmentDate, appointmentTime, location } = req.body;
+  const newAppointment = new Appointment({ userId, applicationId, appointmentDate, appointmentTime, location });
+  await newAppointment.save();
+  if (!newAppointment) return sendResponse(res, 400, true, null, "Appointment Request Failed");
 
-// Add an appointment (example)
-// router.post("/addAppointment", async (req, res) => {
-//   const { userId, applicationId, appointmentDate, appointmentTime, location } = req.body;
-//   const newAppointment = new Appointment({ userId, applicationId, appointmentDate, appointmentTime, location });
-//   await newAppointment.save();
-//   if (!newAppointment) return sendResponse(res, 400, true, null, "Appointment Request Failed");
+  // Send appointment confirmation email
+  const user = await Users.findById(userId);
+  if (user) {
+    await sendEmail(user.email, "Appointment Confirmation", `Your appointment has been scheduled on ${appointmentDate} at ${appointmentTime}.`);
+  }
+  sendResponse(res, 201, false, newAppointment, "Appointment Request Successfully");
+});
 
-//   // Send appointment confirmation email
-//   const user = await Users.findById(userId);
-//   if (user) {
-//     await sendEmail(user.email, "Appointment Confirmation", `Your appointment has been scheduled on ${appointmentDate} at ${appointmentTime}.`);
-//   }
-//   sendResponse(res, 201, false, newAppointment, "Appointment Request Successfully");
-// });
+
 
 export default router;

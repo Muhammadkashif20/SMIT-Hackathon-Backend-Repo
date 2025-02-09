@@ -5,6 +5,8 @@ const appointmentSchema = new mongoose.Schema({
     applicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true }, 
     appointmentDate: { type: Date, required: true }, 
     appointmentTime: { type: String, required: true },
+    city: { type: String, required: true },
+    country: { type: String, required: true },
     location: { type: String, required: true }, 
     slotStatus: { type: String, enum: ['Scheduled', 'Completed', 'Cancelled'], default: 'Scheduled' },
     createdAt: { type: Date, default: Date.now },

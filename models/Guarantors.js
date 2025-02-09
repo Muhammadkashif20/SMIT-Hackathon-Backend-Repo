@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 const { Schema } = mongoose;
-
 const GuarantorSchema = new Schema(
   {
     user: {
@@ -13,7 +12,7 @@ const GuarantorSchema = new Schema(
         name: { type: String, required: true },
         email: { type: String, required: true },
         location: { type: String, required: true },
-        cnic: { type: String, unique: true, required: true }, 
+        cnic: { type: String, unique: true, required: true },
       },
     ],
   },
