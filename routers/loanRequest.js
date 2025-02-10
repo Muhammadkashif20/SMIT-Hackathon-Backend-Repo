@@ -52,28 +52,27 @@ router.get("/getAllApplication", async (req, res) => {
 
 // user Endpoints:-
 router.get("/getLoanRequestById/:id", async (req, res) => {
-  const { id } = req.params;
-  const loan = await LoanRequest.findById(id);
+  const loan = await LoanRequest.findById(req.params.id);
   if (!loan) return sendResponse(res, 400, true, null, "Loan Request Not Found");
-  sendResponse(res, 200, false, loan, "Loan Request Successfully");
+  sendResponse(res, 200, false, loan, "Get Loan Request By ID Successfully");
 });
 
 // user Endpoints:-
-router.get("/getLoanRequest/:cnic", async (req, res) => {
+router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
   const loanRequest = await LoanRequest.find({ cnic: req.params.cnic });
   if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
-  sendResponse(res, 200, false, loanRequest, "Loan Request Successfully");
+  sendResponse(res, 200, false, loanRequest, "Get Loan Request By Cnic Successfully");
 });
 
 // user Endpoints:-
 router.post("/addLoanRequest", async (req, res) => {
-  const { cnic,email, name,loanType,categories,subCategories, maximumloan, loanperiod,city,country } = req.body;
+  const {cnic,email, name,loanType,categories,subCategories, maximumloan, loanperiod,country,city } = req.body;
   console.log("req.body=> ", req.body);
   try {
     if (!cnic || !email || !loanType ||  !name || !categories || !subCategories || !maximumloan || !loanperiod || !city || !country) {
       return sendResponse(res, 400, true, null, "Please provide all required fields"); 
     }
-    const newLoanRequest = new LoanRequest({ email,name, cnic,loanType,categories,subCategories, maximumloan, loanperiod,city,country });
+    const newLoanRequest = new LoanRequest({email,name, cnic,loanType,categories,subCategories, maximumloan, loanperiod,city,country });
     if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
     const newLoan=await newLoanRequest.save();
     if (!newLoan) return sendResponse(res, 400, true, null, "Loan Request Failed");
@@ -104,21 +103,21 @@ router.post("/addLoanRequest", async (req, res) => {
 //    // Send confirmation email
 //   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
 // });
-router.post("/verifyPassword", async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const userPassword = await Password.findOne({ email });
-    if (!userPassword) {
-      return sendResponse(res, 404, true, null, "User not found");
-    }
-    if (userPassword.genPassword !== password) {
-      return sendResponse(res, 401, true, null, "Invalid password");
-    }
-    sendResponse(res, 200, false, null, "Password verified successfully");
-  } catch (error) {
-    sendResponse(res, 500, true, null, "An error occurred while verifying the password");
-  }
-});
+// router.post("/verifyPassword", async (req, res) => {
+//   const { email, password } = req.body;
+//   try {
+//     const userPassword = await Password.findOne({ email });
+//     if (!userPassword) {
+//       return sendResponse(res, 404, true, null, "User not found");
+//     }
+//     if (userPassword.genPassword !== password) {
+//       return sendResponse(res, 401, true, null, "Invalid password");
+//     }
+//     sendResponse(res, 200, false, null, "Password verified successfully");
+//   } catch (error) {
+//     sendResponse(res, 500, true, null, "An error occurred while verifying the password");
+//   }
+// });
 router.get("/getAppointment", async (req, res) => {
   const { city, country } = req.query;
   console.log("req.query=>",req.query);

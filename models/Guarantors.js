@@ -5,14 +5,14 @@ const GuarantorSchema = new Schema(
     user: {
       name: { type: String, required: true },
       address: { type: String, required: true },
-      phone: { type: String, required: true },
+      phone: { type: Number, required: true },
     },
     guarantors: [
       {
         name: { type: String, required: true },
         email: { type: String, required: true },
         location: { type: String, required: true },
-        cnic: { type: String, unique: true, required: true },
+        cnic: { type: String,  required: true },
       },
     ],
   },
