@@ -20,14 +20,15 @@ router.get("/getAppointment", async (req, res) => {
 });
 // Get All Appointment Slip
 router.get("/getSlip",async(req,res)=>{
-  const {date,time,officeLocation}=req.body
-  console.log("req.body=>",req.body);
-  console.log("req.body.date=>",req.body.date);
-  console.log("req.body.time=>",req.body.time);
-  console.log("req.body.officeLocation=>",req.body.officeLocation);
-  
-  let appointmentSlips = await AppointmentSlip.find(date,time,officeLocation);
-  if (!appointmentSlips) return sendResponse(res, 400, true, null, "Get Appointment Slips Failed");
+  const {token,date,time,officeLocation}=req.query
+  console.log("Slipreq.query=>",req.query);
+  console.log("req.body.token=>",token);
+  console.log("req.body.date=>",date);
+  console.log("req.body.time=>",time);
+  console.log("req.body.officeLocation=>",officeLocation);
+  const  queryData={date,time,officeLocation,token}
+  let appointmentSlips = await AppointmentSlip.find(queryData);
+  if (appointmentSlips.length === 0) return sendResponse(res, 400, true, null, "No Appointment Slip Found");
   sendResponse(res, 200, false, appointmentSlips, "Get Appointment Slips Successfully");
 })
 // Add an appointment
