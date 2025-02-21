@@ -2,6 +2,7 @@ import express from "express";
 import Users from "../models/Users.js";
 import Appointment from "../models/Appointment.js";
 import sendResponse from "../Helpers/sendResponse.js";
+import AppointmentSlip from "../models/Slip.js";
 const router = express.Router();
 
 // Get appointments
@@ -17,7 +18,18 @@ router.get("/getAppointment", async (req, res) => {
   if (!appointmentRequest) return sendResponse(res, 400, true, null, "Appointment Request Failed");
   sendResponse(res, 200, false, appointmentRequest, "Appointment Request Successfully");
 });
-
+// Get All Appointment Slip
+router.get("/getSlip",async(req,res)=>{
+  const {date,time,officeLocation}=req.body
+  console.log("req.body=>",req.body);
+  console.log("req.body.date=>",req.body.date);
+  console.log("req.body.time=>",req.body.time);
+  console.log("req.body.officeLocation=>",req.body.officeLocation);
+  
+  let appointmentSlips = await AppointmentSlip.find(date,time,officeLocation);
+  if (!appointmentSlips) return sendResponse(res, 400, true, null, "Get Appointment Slips Failed");
+  sendResponse(res, 200, false, appointmentSlips, "Get Appointment Slips Successfully");
+})
 // Add an appointment
 router.post("/addAppointment", async (req, res) => {
   const { userId, applicationId, appointmentDate, appointmentTime, location } = req.body;

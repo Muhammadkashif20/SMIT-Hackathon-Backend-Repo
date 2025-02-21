@@ -131,6 +131,7 @@ router.get("/getAppointment", async (req, res) => {
   sendResponse(res, 200, false, appointmentRequest, "Appointment Request Successfully");
 });
 
+
 // Add an appointment
 router.post("/addAppointment", async (req, res) => {
   const { userId, applicationId, appointmentDate, appointmentTime, location } = req.body;

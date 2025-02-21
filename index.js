@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import userRouter from "./routers/users.js";
 import authRouter from "./routers/auth.js";
 import loanRequestRouter from "./routers/loanRequest.js";
+import appointmentsRouter from "./routers/appointment.js";
 import guarantorRouter from "./routers/guarantor.js"
 
 const app = express();
@@ -23,7 +24,8 @@ app.use(cors({
   
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
-app.use("/appointments",loanRequestRouter);
+app.use("/application",loanRequestRouter);
+app.use("/appointments",appointmentsRouter);
 app.use("/loan", loanRequestRouter);
 app.use("/guarantor", guarantorRouter);
 app.listen(PORT, () => console.log("Port is Running ON =>", PORT));
