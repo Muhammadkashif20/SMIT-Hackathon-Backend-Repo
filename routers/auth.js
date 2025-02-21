@@ -13,6 +13,7 @@ const registerSchema = Joi.object({
     .required(),
   email: Joi.string().email().required(),
   fullname: Joi.string().min(3).required(),
+  password: Joi.string().min(6).required(),
 });
 const loginSchema = Joi.object({
   cnic: Joi.string()
@@ -23,6 +24,7 @@ const loginSchema = Joi.object({
 });
 router.post("/proceed", async (req, res) => {
   const { error, value } = registerSchema.validate(req.body);
+  console.log("req.body=>", req.body);
   console.log("error=> ", error);
   if (error) return sendResponse(res, 400, true, null, error.message);
   console.log("value=> ", value);
