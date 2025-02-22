@@ -79,6 +79,7 @@ router.post("/addLoanRequest", async (req, res) => {
     console.log("newLoan=>",newLoan);
      sendResponse(res, 201, false, newLoanRequest, "Loan Request Successfully");
   } catch (error) {
+    console.log("error=>",error);
   }
 });
   // console.log("newLoanRequest=> ", newLoanRequest);
