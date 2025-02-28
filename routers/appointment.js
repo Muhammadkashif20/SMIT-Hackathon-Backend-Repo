@@ -3,6 +3,7 @@ import Users from "../models/Users.js";
 import Appointment from "../models/Appointment.js";
 import sendResponse from "../Helpers/sendResponse.js";
 import AppointmentSlip from "../models/Slip.js";
+import { sendEmail } from "./loanRequest.js";
 const router = express.Router();
 // Get All Appointment Slip
 router.get("/getSlip",async(req,res)=>{
