@@ -111,8 +111,11 @@ router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
     if (!newLoan)
       return sendResponse(res, 400, true, null, "Loan Request Failed");
     sendResponse(res, 201, false,newLoanRequest, "Loan Request Successfully");
+  await sendEmail(email, "Loan Request Confirmation , Your loan request has been successfully submitted");
+
   } catch (error) {
     console.log("error=>", error); 
+
   }
 });
 // console.log("newLoanRequest=> ", newLoanRequest);
@@ -157,11 +160,15 @@ router.put("/updateApplicationStatus/:id", async (req, res) => {
     if (!application) {
       return sendResponse(res, 400, true, null, "Application not found");
     }
-
+    await sendEmail(application.email, "Loan Request Confirmation For Saylani Microfinance System!", `Your Loan Applicaton has been ${status}.`);
     return sendResponse(res, 200, false, application, "Application updated successfully");
   } catch (error) {
     console.log("error=>", error);
     return sendResponse(res, 500, true, null, "Internal server error");
   }
+});
+// admin endpoints:-
+router.post("/addTokenNumber", async (req, res) => {
+  
 });
 export default router;

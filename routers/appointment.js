@@ -13,19 +13,21 @@ router.get("/getSlip",async(req,res)=>{
 })
 // Add Appointment Slip
 router.post("/addSlip", async (req, res) => {
-  const {userId, date, time, officeLocation, token } = req.body;
+  const {date, time, officeLocation, token,email} = req.body;
   console.log("req.body=> ", req.body);
   try {
-    const newAppointmentSlip = new AppointmentSlip({userId, date, time, officeLocation, token });
+    const newAppointmentSlip = new AppointmentSlip({date, time, officeLocation, token });
     if (!newAppointmentSlip) return sendResponse(res, 400, true, null, "Appointment Slip Request Failed");
     const newSlip=await newAppointmentSlip.save();
     if (!newSlip) return sendResponse(res, 400, true, null, "Appointment Slip Request Failed");
     console.log("newSlip=>",newSlip);
-     // Send appointment confirmation email
-  const user = await Users.findById(userId);
-  if (user) {
-    await sendEmail(user.email, "Appointment Confirmation", `Your appointment has been scheduled on ${date} at ${time}.`);
-  }
+    console.log("token=>",token);
+    console.log("email=>",email);
+    const user = await Users.findOne({email});
+    console.log("user.email=>",user.email);
+  
+    // Send appointment confirmation email
+    await sendEmail(user.email, "Appointment Confirmation For Saylani Microfinance System!", `Your appointment has been scheduled on ${date} at ${time}.`);
      sendResponse(res, 201, false, newAppointmentSlip, "Add Appointment Slip Successfully");
   } catch (error) {
    console.log("error=>",error);

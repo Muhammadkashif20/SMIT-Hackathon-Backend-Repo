@@ -6,6 +6,7 @@ import "dotenv/config";
 import jwt from "jsonwebtoken";
 import sendResponse from "../Helpers/sendResponse.js";
 import Users from "../models/Users.js";
+import { sendEmail } from "./loanRequest.js";
 const registerSchema = Joi.object({
   cnic: Joi.string()
     .length(13)
@@ -13,7 +14,7 @@ const registerSchema = Joi.object({
     .required(),
   email: Joi.string().email().required(),
   fullname: Joi.string().min(3).required(),
-  password: Joi.string().min(6).required(),
+  // password: Joi.string().min(6).required(),
 });
 const loginSchema = Joi.object({
   cnic: Joi.string()
@@ -44,7 +45,12 @@ router.post("/proceed", async (req, res) => {
   const responseData = { newUser, plainPassword: genRandomPass };
   console.log("Response Data=>", responseData); 
   sendResponse(res, 201, false, responseData, "User Registered Successfully");
+    // await sendEmail(user.email, "Loan Request Confirmation , Your loan request has been successfully submitted");
+    console.log("user.email=>",value.email);
+    console.log("user.fullname=>",value.fullname);
 
+    await sendEmail(value.email,"Account Created Successfully For Saylani Microfinance System!",`User: ${value.fullname}`);
+    await sendEmail(value.email,"your Account Password For Saylani Microfinance System!",`Password: ${genRandomPass}`);
 });
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
@@ -61,6 +67,7 @@ router.post("/login", async (req, res) => {
 
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   sendResponse(res, 201, false, { user, token }, "User Logged In Successfully");
+  await sendEmail(user.email, "Login Confirmation For Saylani Microfinance System!", `You have successfully logged in to Saylani Microfinance System.`);
 });
 router.post("/updatePassword", async (req, res) => {
   try {
@@ -86,6 +93,7 @@ router.post("/updatePassword", async (req, res) => {
     user.password = hashedPassword;
     await user.save();
     sendResponse(res, 200, false, null, "Password updated successfully");
+    await sendEmail(user.email, "Password Updated For Saylani Microfinance System!", `Your password has been updated successfully New Password is: ${password}`);
   } catch (error) {
     console.error("Error updating password:", error);
     sendResponse(res, 500, true, null, "Internal server error");

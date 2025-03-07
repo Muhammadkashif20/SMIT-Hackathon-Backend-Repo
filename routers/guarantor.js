@@ -1,6 +1,7 @@
 import express from "express";
 import sendResponse from "../Helpers/sendResponse.js";
 import GuarantorsInfo from "../models/Guarantors.js";
+import { sendEmail } from "./loanRequest.js";
 const router = express.Router();
 router.get("/getGuarantorInfo", async (req, res) => {
     const storeUser = await GuarantorsInfo.find();
@@ -15,7 +16,7 @@ router.get("/getGuarantorInfo", async (req, res) => {
       console.log("guarantors=> ",guarantors);
       console.log("user=> ",user);
     try {
-      if (!user.name || !user.address || !user.phone) {
+      if (!user.name || !user.address || !user.phone || !user.email) {
         return sendResponse(res, 400, true, null, "Please provide all required fields"); 
       }
       const newGuarantorRequest =new GuarantorsInfo({user,guarantors});
@@ -24,8 +25,9 @@ router.get("/getGuarantorInfo", async (req, res) => {
 
       if (!newGuarantor) return sendResponse(res, 400, true, null, "Guarantor Add Failed");
       console.log("newGuarantor=>",newGuarantor);
-      
-       sendResponse(res, 201, false, newGuarantorRequest, "Guarantor Add Successfully");
+        console.log("user.email=>",user.email);
+       sendResponse(res, 201, false, newGuarantorRequest, "Guarantor Add Successfully");  
+       sendEmail(user.email,"Guarantor Add Successfully! For Saylani Microfinance System!")
     } catch (error) {
       sendResponse(res, 500, true, null, "Server Error: " + error.message);
     }
