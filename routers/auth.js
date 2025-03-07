@@ -14,7 +14,7 @@ const registerSchema = Joi.object({
     .required(),
   email: Joi.string().email().required(),
   fullname: Joi.string().min(3).required(),
-  // password: Joi.string().min(6).optional(),
+  password: Joi.string().min(6).optional(),
 });
 const loginSchema = Joi.object({
   cnic: Joi.string()
@@ -38,7 +38,7 @@ router.post("/proceed", async (req, res) => {
   console.log("genRandomPass=>", genRandomPass);
   let newUser = new Users({
     ...value,
-    // password: hashPass,
+    password: hashPass,
   });
   newUser = await newUser.save();
   console.log("newUser=> ", newUser);
