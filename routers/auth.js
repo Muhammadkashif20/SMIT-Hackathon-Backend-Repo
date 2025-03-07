@@ -38,14 +38,13 @@ router.post("/proceed", async (req, res) => {
   console.log("genRandomPass=>", genRandomPass);
   let newUser = new Users({
     ...value,
-    password: hashPass,
+    // password: hashPass,
   });
   newUser = await newUser.save();
   console.log("newUser=> ", newUser);
   const responseData = { newUser, plainPassword: genRandomPass };
   console.log("Response Data=>", responseData); 
   sendResponse(res, 201, false, responseData, "User Registered Successfully");
-    // await sendEmail(user.email, "Loan Request Confirmation , Your loan request has been successfully submitted");
     console.log("user.email=>",value.email);
     console.log("user.fullname=>",value.fullname);
 
