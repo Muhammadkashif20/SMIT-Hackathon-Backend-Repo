@@ -53,11 +53,14 @@ router.post("/proceed", async (req, res) => {
 });
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
+  console.log("req.body=>",req.body);
+  
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
 
   const user = await Users.findOne({ cnic: value.cnic })
     .select("+password") 
     .lean()
+    console.log("User=>", user);
 
   if (!user) return sendResponse(res, 400, true, null, "User is Not Registered");
 
