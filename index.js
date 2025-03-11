@@ -16,7 +16,7 @@ mongoose
 .catch((err) => console.log("Error", err));
 app.use(express.json());
 app.use(cors({
-    origin: ["https://smit-hackathon-frontend.vercel.app"],
+    origin: "*",
     methods: ["GET", "POST","PUT","DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })); 

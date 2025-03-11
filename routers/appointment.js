@@ -33,18 +33,5 @@ router.post("/addSlip", async (req, res) => {
    console.log("error=>",error);
   }
 });
-// extra check api
-// router.post("/addAppointment", async (req, res) => {
-//   const { userId, applicationId, appointmentDate, appointmentTime, location } = req.body;
-//   const newAppointment = new Appointment({ userId, applicationId, appointmentDate, appointmentTime, location });
-//   await newAppointment.save();
-//   if (!newAppointment) return sendResponse(res, 400, true, null, "Appointment Request Failed");
 
-//   // Send appointment confirmation email
-//   const user = await Users.findById(userId);
-//   if (user) {
-//     await sendEmail(user.email, "Appointment Confirmation", `Your appointment has been scheduled on ${appointmentDate} at ${appointmentTime}.`);
-//   }
-//   sendResponse(res, 201, false, newAppointment, "Appointment Request Successfully");
-// });
-export default router
+export default router;
