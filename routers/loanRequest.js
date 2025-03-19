@@ -73,7 +73,7 @@ router.get("/getLoanRequestById/:id", async (req, res) => {
   if (!loan)
     return sendResponse(res, 400, true, null, "Loan Request Not Found");
   sendResponse(res, 200, false, loan, "Get Loan Request By ID Successfully");
-});
+}); 
 
 // user Endpoints:-
 router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {

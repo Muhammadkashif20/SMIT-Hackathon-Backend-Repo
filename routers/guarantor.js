@@ -9,6 +9,12 @@ router.get("/getGuarantorInfo", async (req, res) => {
     if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
     sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
   });
+  router.get("/getGuarantorInfoById/:id", async (req, res) => {
+    const storeUser = await GuarantorsInfo.find({_id: req.params.id });
+         console.log("storeUser=>",storeUser);
+    if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
+    sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
+  });
 
   router.post("/addGuarantorInfo", async (req, res) => {
     const {user,guarantors} = req.body;
@@ -27,7 +33,8 @@ router.get("/getGuarantorInfo", async (req, res) => {
       console.log("newGuarantor=>",newGuarantor);
         console.log("user.email=>",user.email);
        sendResponse(res, 201, false, newGuarantorRequest, "Guarantor Add Successfully");  
-       sendEmail(user.email,"Guarantor Add Successfully! For Saylani Microfinance System!")
+       sendEmail(user.email,"Guarantor's & User Information Add Successfully! For Saylani Microfinance System!")
+       sendEmail(user.email,"Saylani Microfinance System!",`Guarantor's & User Information Add Successfully!`)
     } catch (error) {
       sendResponse(res, 500, true, null, "Server Error: " + error.message);
     }
