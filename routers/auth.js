@@ -43,45 +43,68 @@ router.post("/proceed", async (req, res) => {
   newUser = await newUser.save();
   console.log("newUser=> ", newUser);
   const responseData = { newUser, plainPassword: genRandomPass };
-  console.log("Response Data=>", responseData); 
+  console.log("Response Data=>", responseData);
   sendResponse(res, 201, false, responseData, "User Registered Successfully");
-    console.log("user.email=>",value.email);
-    console.log("user.fullname=>",value.fullname);
+  console.log("user.email=>", value.email);
+  console.log("user.fullname=>", value.fullname);
 
-    await sendEmail(value.email,"Account Created Successfully For Saylani Microfinance System!",`User: ${value.fullname}`);
-    await sendEmail(value.email,"your Account Password For Saylani Microfinance System!",`Password: ${genRandomPass}`);
+  await sendEmail(
+    value.email,
+    "Account Created Successfully For Saylani Microfinance System!",
+    `User: ${value.fullname}`
+  );
+  await sendEmail(
+    value.email,
+    "your Account Password For Saylani Microfinance System!",
+    `Password: ${genRandomPass}`
+  );
 });
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
-  console.log("req.body=>",req.body);
+  console.log("req.body=>", req.body);
   console.log("error=> ", error);
   console.log("value=> ", value);
-  
+
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
 
   const user = await Users.findOne({ cnic: value.cnic })
-    .select("+password") 
-    .lean()
-    console.log("User=>", user);
+    .select("+password")
+    .lean();
+  console.log("User=>", user);
 
-  if (!user) return sendResponse(res, 400, true, null, "User is Not Registered");
+  if (!user)
+    return sendResponse(res, 400, true, null, "User is Not Registered");
 
   const isMatch = await bcrypt.compare(value.password, user.password);
+  console.log("isMatch=>", isMatch);
+  console.log("value.password=>", value.password);
+  console.log("user.password=>", user.password);
+  
   if (!isMatch) return sendResponse(res, 400, true, null, "Incorrect password");
 
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   sendResponse(res, 201, false, { user, token }, "User Logged In Successfully");
-  await sendEmail(user.email, "Login Confirmation For Saylani Microfinance System!", `You have successfully logged in to Saylani Microfinance System.`);
+  await sendEmail(
+    user.email,
+    "Login Confirmation For Saylani Microfinance System!",
+    `You have successfully logged in to Saylani Microfinance System.`
+  );
 });
 router.post("/updatePassword", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
-    console.log("token=>",token);
+    console.log("token=>", token);
     if (!token) {
-      return sendResponse(res, 401, true, null, "Unauthorized: No token provided");
+      return sendResponse(
+        res,
+        401,
+        true,
+        null,
+        "Unauthorized: No token provided"
+      );
     }
     const decoded = jwt.verify(token, process.env.AUTH_SECRET);
-    const cnic = decoded.cnic; 
+    const cnic = decoded.cnic;
     const { oldPassword, password } = req.body;
     console.log("Received Old Password:", oldPassword);
     const user = await Users.findOne({ cnic }).select("+password");
@@ -90,19 +113,23 @@ router.post("/updatePassword", async (req, res) => {
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     console.log("Password Match Result:", isMatch);
-    if (!isMatch) return sendResponse(res, 400, true, null, "Old password is incorrect");
+    if (!isMatch)
+      return sendResponse(res, 400, true, null, "Old password is incorrect");
 
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("New Hashed Password:", hashedPassword);
     user.password = hashedPassword;
     await user.save();
     sendResponse(res, 200, false, null, "Password updated successfully");
-    await sendEmail(user.email, "Password Updated For Saylani Microfinance System!", `Your password has been updated successfully New Password is: ${password}`);
+    await sendEmail(
+      user.email,
+      "Password Updated For Saylani Microfinance System!",
+      `Your password has been updated successfully New Password is: ${password}`
+    );
   } catch (error) {
     console.error("Error updating password:", error);
     sendResponse(res, 500, true, null, "Internal server error");
   }
 });
-
 
 export default router;
