@@ -22,6 +22,7 @@ const loginSchema = Joi.object({
     .pattern(/^[0-9]+$/)
     .required(),
   password: Joi.string().min(6).required(),
+  role: Joi.string() ,enum: ["user", "admin"], default : "user"
 });
 router.post("/proceed", async (req, res) => {
   const { error, value } = registerSchema.validate(req.body);
@@ -74,14 +75,12 @@ router.post("/login", async (req, res) => {
 
   if (!user)
     return sendResponse(res, 400, true, null, "User is Not Registered");
-
   const isMatch = await bcrypt.compare(value.password, user.password);
   console.log("isMatch=>", isMatch);
   console.log("value.password=>", value.password);
   console.log("user.password=>", user.password);
-  
+      console.log("user.role=>",user.role)
   if (!isMatch) return sendResponse(res, 400, true, null, "Incorrect password");
-
   var token = jwt.sign(user, process.env.AUTH_SECRET);
   sendResponse(res, 201, false, { user, token }, "User Logged In Successfully");
   await sendEmail(

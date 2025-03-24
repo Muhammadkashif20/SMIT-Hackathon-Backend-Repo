@@ -1,11 +1,8 @@
 import express from "express";
 import sendResponse from "../Helpers/sendResponse.js";
 import LoanRequest from "../models/LoanRequest.js";
-import Users from "../models/Users.js";
-import Appointment from "../models/Appointment.js";
+import "dotenv/config";
 import nodemailer from "nodemailer";
-import Password from "../models/Password.js";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const router = express.Router();
 const transporter = nodemailer.createTransport({
@@ -47,6 +44,13 @@ router.get("/allApplication", async (req, res) => {
     return sendResponse(res, 400, true, null, "Application Request Failed");
   sendResponse(res,200,false, allApplication,"Get All Application Successfully")
   })
+// admin Endpoints:-
+ router.get("/getAppointmentByToken/:token", async (req, res) => { 
+  const appointment = await LoanRequest.find({ token: req.params.token });
+  if (!appointment)
+    return sendResponse(res, 400, true, null, "Appointment Failed");
+  sendResponse(res, 200, false, appointment, "Get Appointment By Token Successfully");
+ })
 // admin Endpoints:-
 router.get("/applicationCityCountry", async (req, res) => {
   const { city, country } = req.query;
@@ -98,7 +102,7 @@ router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
     ){
           return sendResponse(res,400, true, null, "Please provide all required fields");
 }
-    let token = await jwt.sign({ email }, process.env.AUTH_SECRET);
+    let token = Math.floor(100000 + Math.random() * 9000000).toString();
 
      const newLoanRequest = new LoanRequest({token, email, name, cnic, loanType, categories, subCategories, maximumloan, loanperiod, city, country,status});
     console.log("newLoanRequest=>",newLoanRequest);
@@ -169,6 +173,22 @@ router.put("/updateApplicationStatus/:id", async (req, res) => {
 });
 // admin endpoints:-
 router.post("/addTokenNumber", async (req, res) => {
-  
+  const { tokenNumber, id } = req.body;
+  console.log("req.body=>", req.body);
+  try {
+    if (!tokenNumber || !id) {
+      return sendResponse(res, 400, true, null, "Please provide all required fields");
+    }
+    const application = await LoanRequest.findByIdAndUpdate(id, {token} , { new: true });
+    console.log("application=>", application);
+    if (!application) {
+      return sendResponse(res, 400, true, null, "Application not found");
+    }
+    return sendResponse(res, 200, false, application, "Application updated successfully");
+  } catch (error) {
+    console.log("error=>", error);
+    return sendResponse(res, 500, true, null, "Internal server error");
+  }
 });
+
 export default router;

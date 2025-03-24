@@ -8,7 +8,7 @@ router.get("/getGuarantorInfo", async (req, res) => {
          console.log("storeUser=>",storeUser);
     if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
     sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
-  });
+  }); 
   router.get("/getGuarantorInfoById/:id", async (req, res) => {
     const storeUser = await GuarantorsInfo.find({_id: req.params.id });
          console.log("storeUser=>",storeUser);
