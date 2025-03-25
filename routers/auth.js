@@ -8,19 +8,13 @@ import sendResponse from "../Helpers/sendResponse.js";
 import Users from "../models/Users.js";
 import { sendEmail } from "./loanRequest.js";
 const registerSchema = Joi.object({
-  cnic: Joi.string()
-    .length(13)
-    .pattern(/^[0-9]+$/)
-    .required(),
+  cnic: Joi.string().length(13).pattern(/^[0-9]+$/).required(),
   email: Joi.string().email().required(),
   fullname: Joi.string().min(3).required(),
   password: Joi.string().min(6).optional(),
 });
 const loginSchema = Joi.object({
-  cnic: Joi.string()
-    .length(13)
-    .pattern(/^[0-9]+$/)
-    .required(),
+  cnic: Joi.string().length(13).pattern(/^[0-9]+$/).required(),
   password: Joi.string().min(6).required(),
   role: Joi.string() ,enum: ["user", "admin"], default : "user"
 });
