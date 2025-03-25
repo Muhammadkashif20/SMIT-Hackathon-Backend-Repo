@@ -10,11 +10,12 @@ import guarantorRouter from "./routers/guarantor.js"
 const app = express();
 const PORT = 5000;
 app.use(cors({
-  origin:"*",
+  origin:"https://smit-hackathon-frontend.vercel.app",
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
+app.options("*", cors()); 
 
 app.use(express.json());
 mongoose
