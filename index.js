@@ -9,10 +9,12 @@ import guarantorRouter from "./routers/guarantor.js"
 
 const app = express();
 const PORT = 5000;
+let vercelFrontend = "https://smit-hackathon-frontend.vercel.app/";
 app.use(cors({
-  origin: "*",
+  origin: vercelFrontend ||"http://localhost:5173/",
   methods: ["GET", "POST","PUT","DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));  
 
 app.use(express.json());
