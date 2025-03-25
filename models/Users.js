@@ -6,7 +6,7 @@ const userSchema = new Schema(
     cnic: { type: Number, unique: true},
     email: { type: String, required: true },
     password: { type: String},
-    country: { type: String },
+    // country: { type: String },
     role: { type: String, enum: ["user", "admin"], default: "user" }, 
     },
   { timestamps: true }

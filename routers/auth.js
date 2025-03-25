@@ -57,11 +57,9 @@ router.post("/proceed", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
   console.log("req.body=>", req.body);
-  console.log("error=> ", error);
-  console.log("value=> ", value);
-
+  // console.log("error=> ", error);
+  try {
   if (error) return sendResponse(res, 400, true, null, "Invalid Credentials");
-
   const user = await Users.findOne({ cnic: value.cnic })
     .select("+password")
     .lean();
@@ -69,7 +67,7 @@ router.post("/login", async (req, res) => {
 
   if (!user)
     return sendResponse(res, 400, true, null, "User is Not Registered");
-  const isMatch = await bcrypt.compare(value.password, user.password);
+  const isMatch = bcrypt.compare(value.password, user.password);
   console.log("isMatch=>", isMatch);
   console.log("value.password=>", value.password);
   console.log("user.password=>", user.password);
@@ -82,6 +80,9 @@ router.post("/login", async (req, res) => {
     "Login Confirmation For Saylani Microfinance System!",
     `You have successfully logged in to Saylani Microfinance System.`
   );
+} catch (error) {
+    console.log("Error=>",error)
+}
 });
 router.post("/updatePassword", async (req, res) => {
   try {
