@@ -9,13 +9,13 @@ import guarantorRouter from "./routers/guarantor.js"
 
 const app = express();
 const PORT = 5000;
-app.use(cors({
-  origin:"*",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  // credentials: true
-}));
-
+// app.use(cors({
+//   origin:"*",
+//   methods: ["GET", "POST", "PUT", "DELETE"],
+//   allowedHeaders: ["Content-Type", "Authorization"],
+//   // credentials: true
+// }));
+app.use(cors());
 app.use(express.json());
 mongoose
 .connect(process.env.MONGODBURI)
