@@ -3,7 +3,6 @@ import sendResponse from "../Helpers/sendResponse.js";
 import LoanRequest from "../models/LoanRequest.js";
 import "dotenv/config";
 import nodemailer from "nodemailer";
-import jwt from "jsonwebtoken";
 const router = express.Router();
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -82,15 +81,8 @@ router.get("/getLoanRequestById/:id", async (req, res) => {
 // user Endpoints:-
 router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
   const loanRequest = await LoanRequest.find({ cnic: req.params.cnic });
-  if (!loanRequest)
-    return sendResponse(res, 400, true, null, "Loan Request Failed");
-  sendResponse(
-    res,
-    200,
-    false,
-    loanRequest,
-    "Get Loan Request By Cnic Successfully"
-  );
+  if (!loanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
+  sendResponse( res, 200, false, loanRequest, "Get Loan Request By Cnic Successfully");
 });
 
 // user Endpoints:-
@@ -98,59 +90,24 @@ router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
   const { cnic, email, name, loanType, categories, subCategories, maximumloan, loanperiod, country, city,status } = req.body;
   console.log("req.body=> ", req.body);
   try {
-    if ( !cnic || !email || !loanType || !name || !categories || !subCategories || !maximumloan || !loanperiod || !city || !country
-    ){
+    if ( !cnic || !email || !loanType || !name || !categories || !subCategories || !maximumloan || !loanperiod || !city || !country){
           return sendResponse(res,400, true, null, "Please provide all required fields");
 }
-    let token = Math.floor(100000 + Math.random() * 9000000).toString();
-
-     const newLoanRequest = new LoanRequest({token, email, name, cnic, loanType, categories, subCategories, maximumloan, loanperiod, city, country,status});
-    console.log("newLoanRequest=>",newLoanRequest);
+    let loanToken = Math.floor(100000 + Math.random() * 9000000).toString();
+    const newLoanRequest = new LoanRequest({loanToken,email, name, cnic, loanType, categories, subCategories, maximumloan, loanperiod, city, country,status});
+    console.log("newLoanRequest=>",newLoanRequest); 
     
-    if (!newLoanRequest)
-      return sendResponse(res, 400, true, null, "Loan Request Failed");
+    if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
     const newLoan = await newLoanRequest.save();
     console.log("newLoan=>", newLoan);
-
-    if (!newLoan)
-      return sendResponse(res, 400, true, null, "Loan Request Failed");
+    if (!newLoan) return sendResponse(res, 400, true, null, "Loan Request Failed");
     sendResponse(res, 201, false,newLoanRequest, "Loan Request Successfully");
-  await sendEmail(email, "Loan Request Confirmation , Your loan request has been successfully submitted");
-
-  } catch (error) {
+  await sendEmail(email, "Loan Request Confirmation , Your loan request has been successfully submitted")
+}
+   catch (error) {
     console.log("error=>", error); 
-
   }
 });
-// console.log("newLoanRequest=> ", newLoanRequest);
-//   let user = await Users.findOne({ email });
-//   if (!user) {
-//     user = new Users({ email, name });
-//     await user.save();
-//   }
-// let genPassword=123456
-//     // save email and new password to new schema
-//     let newUser=new Password({email:email,genPassword})
-//     await newUser.save()
-//    // Send confirmation email
-//   await sendEmail(email, "Loan Request Confirmation", `Your loan request has been successfully submitted, your new password is ${genPassword}.`);
-// });
-
-// router.post("/verifyPassword", async (req, res) => {
-//   const { email, password } = req.body;
-//   try {
-//     const userPassword = await Password.findOne({ email });
-//     if (!userPassword) {
-//       return sendResponse(res, 404, true, null, "User not found");
-//     }
-//     if (userPassword.genPassword !== password) {
-//       return sendResponse(res, 401, true, null, "Invalid password");
-//     }
-//     sendResponse(res, 200, false, null, "Password verified successfully");
-//   } catch (error) {
-//     sendResponse(res, 500, true, null, "An error occurred while verifying the password");
-//   }
-// });
 // admin endpoints:-
 router.put("/updateApplicationStatus/:id", async (req, res) => {
   try {
@@ -172,23 +129,25 @@ router.put("/updateApplicationStatus/:id", async (req, res) => {
   }
 });
 // admin endpoints:-
-router.post("/addTokenNumber", async (req, res) => {
-  const { tokenNumber, id } = req.body;
-  console.log("req.body=>", req.body);
-  try {
-    if (!tokenNumber || !id) {
-      return sendResponse(res, 400, true, null, "Please provide all required fields");
-    }
-    const application = await LoanRequest.findByIdAndUpdate(id, {token} , { new: true });
-    console.log("application=>", application);
-    if (!application) {
-      return sendResponse(res, 400, true, null, "Application not found");
-    }
-    return sendResponse(res, 200, false, application, "Application updated successfully");
-  } catch (error) {
-    console.log("error=>", error);
-    return sendResponse(res, 500, true, null, "Internal server error");
-  }
-});
+// If, for any reason, a token is not generated in the loan request, the admin can manually add it using this API.
 
+router.post("/addTokenNumber", async (req, res) => {
+  const { loanToken,_id } = req.body;
+  console.log("req.body=>", req.body);
+ try {
+  if(!loanToken || !_id){
+    return sendResponse(res,400,true,null,"Please provide all required fields")
+  }
+  const loanRequest = await LoanRequest.findById(_id);
+  if(loanRequest.loanToken){
+    return sendResponse(res,400,true,null,"Token already exist")
+  }
+  loanRequest.loanToken = loanToken;
+  await loanRequest.save();
+  sendResponse(res,201,false,loanRequest,"Token added successfully")
+  await sendEmail(loanRequest.email, "Token Confirmation For Saylani Microfinance System!", `Your Token Number is ${loanToken}.`);
+ } catch (error) {
+  console.log("error=>",error);
+ }
+})
 export default router;
