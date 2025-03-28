@@ -19,7 +19,8 @@ const loginSchema = Joi.object({
   role: Joi.string() ,enum: ["user", "admin"], default : "user"
 });
 router.post("/proceed", async (req, res) => {
-  const { error, value } = registerSchema.validate(req.body);
+  try {
+    const { error, value } = registerSchema.validate(req.body);
   console.log("req.body=>", req.body);
   console.log("error=> ", error);
   if (error) return sendResponse(res, 400, true, null, error.message);
@@ -28,7 +29,7 @@ router.post("/proceed", async (req, res) => {
   if (user) return sendResponse(res, 400, true, null, "User Already Exists");
   // after add new user generate a random password with converted into hashed:-
   let genRandomPass = Math.random().toString(36).slice(-8);
-  let hashPass = await bcrypt.hash(genRandomPass, 10);
+  let hashPass = await bcrypt.hash(genRandomPass, 8);
   console.log("hashPass=>", hashPass);
   console.log("genRandomPass=>", genRandomPass);
   let newUser = new Users({
@@ -53,6 +54,11 @@ router.post("/proceed", async (req, res) => {
     "your Account Password For Saylani Microfinance System!",
     `Password: ${genRandomPass}`
   );
+  } catch (error) {
+    console.log("Error=>", error);
+    sendResponse(res, 500, true, null, "Internal server error");
+  }
+  
 });
 router.post("/login", async (req, res) => {
   const { error, value } = loginSchema.validate(req.body);
@@ -88,42 +94,49 @@ router.post("/updatePassword", async (req, res) => {
   try {
     const token = req.headers.authorization?.split(" ")[1];
     console.log("token=>", token);
+
     if (!token) {
-      return sendResponse(
-        res,
-        401,
-        true,
-        null,
-        "Unauthorized: No token provided"
-      );
+      return sendResponse(res, 401, true, null, "Unauthorized: No token provided");
     }
+
     const decoded = jwt.verify(token, process.env.AUTH_SECRET);
     const cnic = decoded.cnic;
     const { oldPassword, password } = req.body;
+
     console.log("Received Old Password:", oldPassword);
+
     const user = await Users.findOne({ cnic }).select("+password");
-    if (!user) return sendResponse(res, 400, true, null, "User not found");
+    if (!user) {
+      return sendResponse(res, 400, true, null, "User not found");
+    }
+
     console.log("Stored Hashed Password:", user.password);
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     console.log("Password Match Result:", isMatch);
-    if (!isMatch)
+
+    if (!isMatch) {
       return sendResponse(res, 400, true, null, "Old password is incorrect");
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     console.log("New Hashed Password:", hashedPassword);
+
     user.password = hashedPassword;
     await user.save();
+
     sendResponse(res, 200, false, null, "Password updated successfully");
+
     await sendEmail(
       user.email,
       "Password Updated For Saylani Microfinance System!",
-      `Your password has been updated successfully New Password is: ${password}`
+      `Your password has been updated successfully. New Password is: ${password}`
     );
   } catch (error) {
     console.error("Error updating password:", error);
     sendResponse(res, 500, true, null, "Internal server error");
   }
 });
+
 
 export default router;

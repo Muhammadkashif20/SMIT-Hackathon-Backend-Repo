@@ -17,8 +17,7 @@ const PORT = 5000;
 // }));
 app.use(cors());
 app.use(express.json());
-mongoose
-.connect(process.env.MONGODBURI)
+mongoose.connect(process.env.MONGODBURI)
 .then(() => console.log("Mongodb is Connected!"))
 .catch((err) => console.log("Error", err));
 
