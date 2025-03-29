@@ -3,18 +3,18 @@ const { Schema } = mongoose;
 const GuarantorSchema = new Schema(
   {
     user: {
-      name: { type: String, required: true ,length: 25},
-      address: { type: String, required: true ,length: 30},
-      phone: { type: Number, required: true , length: 11},
+      name: { type: String, required: true },
+      address: { type: String, required: true },
+      phone: { type: Number, required: true  , maxlength: 11},
       email: { type: String, required: true },
       userId:{type:Schema.Types.ObjectId}
     },
     guarantors: [
       {
-        name: { type: String, required: true ,length: 25},
+        name: { type: String, required: true },
         email: { type: String, required: true },
-        location: { type: String, required: true ,length: 30},
-        cnic: { type: String,  required: true , length: 13},
+        location: { type: String, required: true },
+        cnic: { type: String,  required: true , maxlength: 13},
       },
     ],
   },

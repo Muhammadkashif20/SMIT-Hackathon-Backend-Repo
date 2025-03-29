@@ -94,7 +94,7 @@ router.get("/getLoanRequestByCnic/:cnic", async (req, res) => {
           return sendResponse(res,400, true, null, "Please provide all required fields");
 }
     let loanToken = Math.floor(100000 + Math.random() * 9000000).toString();
-    const newLoanRequest = new LoanRequest({loanToken,email, name, cnic, loanType, categories, subCategories, maximumloan, loanperiod, city, country,status});
+    const newLoanRequest = new LoanRequest({token,email, name, cnic, loanType, categories, subCategories, maximumloan, loanperiod, city, country,status});
     console.log("newLoanRequest=>",newLoanRequest); 
     
     if (!newLoanRequest) return sendResponse(res, 400, true, null, "Loan Request Failed");
@@ -129,8 +129,7 @@ router.put("/updateApplicationStatus/:id", async (req, res) => {
   }
 });
 // admin endpoints:-
-// If, for any reason, a token is not generated in the loan request, the admin can manually add it using this API.
-
+// If, for any reason, a token is not generated in the loan request, the admin can manually add it using this API (addTokenNumber).
 router.post("/addTokenNumber", async (req, res) => {
   const { loanToken,_id } = req.body;
   console.log("req.body=>", req.body);

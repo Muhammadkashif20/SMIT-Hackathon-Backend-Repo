@@ -12,7 +12,7 @@ const loanRequestSchema = new Schema(
     loanperiod: { type: Number, required: true },
     city: { type: String, required: true },
     country: { type: String, required: true },
-    loanToken: { type: String },
+    token: { type: String },
     status:{type:String, default:"pending"}
   },
   { timestamps: true }
