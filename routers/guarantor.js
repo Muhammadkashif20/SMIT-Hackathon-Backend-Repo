@@ -5,16 +5,30 @@ import { sendEmail } from "./loanRequest.js";
 import LoanRequest from "../models/LoanRequest.js";
 const router = express.Router();
 router.get("/getGuarantorInfo", async (req, res) => {
-    const storeUser = await GuarantorsInfo.find();
+    try {
+        const storeUser = await GuarantorsInfo.find();
          console.log("storeUser=>",storeUser);
     if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
     sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
+    } catch (error) {
+        console.error("Error fetching guarantor info:", error);
+        sendResponse(res, 500, true, null, "Internal Server Error");
+    }
+    
   }); 
-  router.get("/getGuarantorInfoById/:id", async (req, res) => {
-    const storeUser = await GuarantorsInfo.find({_id: req.params._id });
-         console.log("storeUser=>",storeUser);
-    if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
-    sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
+  router.get("/getGuarantorInfoById/:userId", async (req, res) => {
+    try {
+        const userId  = req.params.userId;
+        console.log("userId=>",userId);
+        const storeUser = await GuarantorsInfo.findOne({"user.userId": userId });
+        console.log("userIdByParam=>",userId);
+        console.log("storeUser=>",storeUser);
+   if (!storeUser) return sendResponse(res, 400, true, null, "Guarantor Get Failed");
+   sendResponse(res, 200, false, storeUser, "Guarantor Get Successfully");
+    } catch (error) {
+        console.error("Error fetching guarantor info:", error);
+        sendResponse(res, 500, true, null, "Internal Server Error");
+    }   
   });
 
   router.post("/addGuarantorInfo", async (req, res) => {
@@ -24,7 +38,6 @@ router.get("/getGuarantorInfo", async (req, res) => {
         if (!user.name || !user.address || !user.phone || !user.email) {
             return sendResponse(res, 400, true, null, "Please provide all required fields");
         }
-
         const loanRequest = await LoanRequest.findOne({ email: user.email });
         console.log("loanRequest=>", loanRequest);
         console.log("user.email=>", user.email);
@@ -34,7 +47,7 @@ router.get("/getGuarantorInfo", async (req, res) => {
 
         const newGuarantorRequest = new GuarantorsInfo({
             user: {
-                _id: loanRequest._id,  
+                userId: loanRequest._id,  
                 name: user.name,
                 address: user.address,
                 phone: user.phone,
@@ -44,9 +57,7 @@ router.get("/getGuarantorInfo", async (req, res) => {
         });
 
         if (!newGuarantorRequest) return sendResponse(res, 400, true, null, "Guarantor Add Failed");
-
         const newGuarantor = await newGuarantorRequest.save();
-
         if (!newGuarantor) return sendResponse(res, 400, true, null, "Guarantor Add Failed");
 
         console.log("newGuarantor=>", newGuarantor);
@@ -60,11 +71,6 @@ router.get("/getGuarantorInfo", async (req, res) => {
     }
 });
 
-  
-
- 
-
-  
   export default router;
   
 

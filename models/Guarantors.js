@@ -7,7 +7,7 @@ const GuarantorSchema = new Schema(
       address: { type: String, required: true ,length: 30},
       phone: { type: Number, required: true , length: 11},
       email: { type: String, required: true },
-      _id:{type:Schema.Types.ObjectId}
+      userId:{type:Schema.Types.ObjectId}
     },
     guarantors: [
       {
